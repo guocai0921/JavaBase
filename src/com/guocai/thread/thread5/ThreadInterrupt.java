@@ -1,4 +1,4 @@
-package com.guocai.thread;
+package com.guocai.thread.thread5;
 
 /**
  * java类简单作用描述
