@@ -1,5 +1,7 @@
 package com.guocai.thread.thread8;
 
+import java.util.stream.Stream;
+
 /**
  * java类简单作用描述
  *
@@ -11,7 +13,7 @@ package com.guocai.thread.thread8;
  * @UpdateRemark: The modified content
  * @Version: 1.0
  */
-public class ProduceConsumerVersion2 {
+public class ProduceConsumerVersion3 {
 
 	private int i = 0;
 	final private Object LOCK = new Object();
@@ -26,7 +28,7 @@ public class ProduceConsumerVersion2 {
 				}
 			} else {
 				i++;
-				System.out.println("P->"+i);
+				System.out.println("Pro->"+i);
 				LOCK.notify();
 				isProduced = true;
 			}
@@ -36,7 +38,7 @@ public class ProduceConsumerVersion2 {
 	public void consumer(){
 		synchronized (LOCK) {
 			if(isProduced){
-				System.out.println("C->"+i);
+				System.out.println("Con->"+i);
 				LOCK.notify();
 				isProduced = false;
 			} else {
@@ -50,17 +52,23 @@ public class ProduceConsumerVersion2 {
 	}
 
 	public static void main(String[] args) {
-		ProduceConsumerVersion2 psv = new ProduceConsumerVersion2();
-		new Thread(()->{
-			while (true) {
-				psv.consumer();
-			}
-		}).start();
-		new Thread(()->{
-			while (true) {
-				psv.produce();
-			}
-		}).start();
+
+		//多生产者和多消费者，易发生全部在wait()中，发生假死现象
+		ProduceConsumerVersion3 psv = new ProduceConsumerVersion3();
+		Stream.of("P1","P2").forEach(n->
+			new Thread(()->{
+				while (true) {
+					psv.consumer();
+				}
+			}).start()
+		);
+		Stream.of("C1","C2").forEach(n->
+			new Thread(()->{
+				while (true) {
+					psv.produce();
+				}
+			}).start()
+		);
 	}
 
 }
